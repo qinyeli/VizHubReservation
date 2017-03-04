@@ -5,6 +5,7 @@ import json
 import getpass
 import time
 
+
 uuid = {
 	1: 'svdkdsflk', # 10
 	2: 'lkklmrkja', # 10
@@ -21,6 +22,7 @@ uuid = {
 	13: 'EFuHkeNKrZ' # 4
 }
 
+
 # epochTime() returns the epoch time for begin time and end time
 def epochTime(day_from_today, hour_begin, hour_end):
 	# Ref: https://docs.python.org/3/library/time.html
@@ -35,14 +37,15 @@ def epochTime(day_from_today, hour_begin, hour_end):
 	time_begin = time.strptime(year + ' ' + str(day) + ' ' + hour_begin, '%Y %j %H')
 	time_end = time.strptime(year + ' ' + str(day) + ' ' + hour_end, '%Y %j %H')
 
-	print('Reserving VizHub for ' + time.strftime('%b. %d %a %H:%M ~ ', time_begin)
-		+ time.strftime('%H:%M', time_end))
+	print('\t' + time.strftime('%b. %d %a %H:%M ~ ', time_begin)
+		+ time.strftime('%H:%M', time_end), end =':\t')
 
 	# mktime converts (local) time.struct_time into epoch time
 	epoch_begin = str(int(time.mktime(time_begin)))
 	epoch_end = str(int(time.mktime(time_end)))
 
 	return epoch_begin, epoch_end
+
 
 def getTime():
 	days = input('Input the days (0 for today, 1 for tomorrow and so on): ').split()
@@ -52,6 +55,7 @@ def getTime():
 	assert(len(hours) == 2)
 
 	return days, hours[0], hours[1]
+
 
 def login():
 	# Ref: http://docs.python-requests.org/
@@ -95,6 +99,8 @@ def main():
 
 	days, hour_begin, hour_end = getTime()
 
+	# Start reserving!
+	print('\nReserving VizHub ' + str(vizhubID) + ' for')
 	for day_from_today in days:
 		epoch_begin, epoch_end = epochTime(day_from_today, hour_begin, hour_end)
 
@@ -104,10 +110,13 @@ def main():
 		id = json.loads(response.text)['id']
 		status = 'Queued' # status will be Queued, Processing, Created, or Failed
 		while status == 'Queued' or status == 'Processing':
-			time.sleep(1)
+			print(status, end = '... ', flush = True)
+			time.sleep(2)
 			response = session.get('https://apps.engin.umich.edu/collab-reserve/reservatron.php?action=status&id=' + str(id))
 			status = json.loads(response.text)['message']
-			print(status)
+			
+		print(status + '!', flush = True)
+
 
 if __name__ == '__main__':
 	print("Running Qinye's VizHub reserving script...")
