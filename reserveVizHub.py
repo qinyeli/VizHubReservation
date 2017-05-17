@@ -75,7 +75,7 @@ def login():
 		'login': login,
 		'password': password
 	}
-	response = session.post('https://weblogin.umich.edu/cosign-bin/cosign.cgi',\
+	response = session.post('https://weblogin.umich.edu/',\
 		data=form, cookies=cookies)
 
 	# print(response.status_code)
